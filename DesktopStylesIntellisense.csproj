@@ -15,8 +15,8 @@
     <ProjectGuid>{20C39D0A-9D5A-45E6-BFD4-D9B37380D86C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NP.XAMLIntellisenseExtensionForVS2017</RootNamespace>
-    <AssemblyName>NP.XAMLIntellisenseExtensionForVS2017</AssemblyName>
+    <RootNamespace>DesktopStylesIntellisense</RootNamespace>
+    <AssemblyName>DesktopStylesIntellisense</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
