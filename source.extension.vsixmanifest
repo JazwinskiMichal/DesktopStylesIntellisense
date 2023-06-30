@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+    <Metadata>
+        <Identity Id="DesktopStylesIntellisense.9c3d92c1-cbae-4738-a2f2-1e48eab3f15a" Version="1.0" Language="en-US" Publisher="MIHOW Michal Jazwinski" />
+        <DisplayName>DesktopStylesIntellisense</DisplayName>
+        <Description xml:space="preserve">Gives IntelliSense for IcPen.Desktop.Styles, allowes to preview Colors, Brushes and Icons.</Description>
+        <Icon>Resources\icon.png</Icon>
+        <PreviewImage>Resources\icon.png</PreviewImage>
+        <Tags>vsix, vssdk, desktopStyles, icPen</Tags>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0]" />
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+    </Dependencies>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
+    </Assets>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
+    <Content>
+        <MefComponent>|%CurrentProject%|</MefComponent>
+    </Content>
+</PackageManifest>
