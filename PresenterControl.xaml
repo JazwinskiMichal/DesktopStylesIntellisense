@@ -8,6 +8,7 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Focusable="False"
+                Loaded="TheCompletionsGrid_Loaded"
                 mc:Ignorable="d">
 
     <ContentControl.Resources>
@@ -21,7 +22,7 @@
                       HorizontalContentAlignment="Stretch"
                       Background="#1F1F1F"
                       BorderBrush="Orange"
-                      ItemsSource="{Binding Path=TheCompletionsCollectionView, ElementName=TheCompletionsGrid}"
+                      ItemsSource="{Binding Path=TheCompletionsCollectionView, ElementName=TheCompletionsGrid, NotifyOnSourceUpdated=True}"
                       IsSynchronizedWithCurrentItem="True"
                       Focusable="False"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -88,16 +89,20 @@
                                    Margin="2,0,5,0"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   Source="{Binding Path=IconSource}"/>
+                                   Source="{Binding Path=Completion.IconSource}"/>
 
                             <!-- Completion Text -->
                             <TextBlock Grid.Column="1"
                                        Margin="0,0,20,0"
                                        Foreground="White"
-                                       Text="{Binding Path=DisplayText}"/>
+                                       Text="{Binding Path=Name}"/>
 
                             <!-- Brush color preview -->
-                            <Border Grid.Column="2" Background="Red"/>
+                            <Border Grid.Column="2" Width="13">
+                                <Border.Background>
+                                    <SolidColorBrush Color="{Binding Path=Value}"/>
+                                </Border.Background>
+                            </Border>
                         </Grid>
                         <DataTemplate.Triggers>
                             <!-- change the item foreground and background when selected -->

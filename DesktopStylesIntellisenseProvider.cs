@@ -19,7 +19,7 @@ namespace DesktopStylesIntellisense
     [ContentType("XAML")]
     [Order(Before = "default")]
     [Name("XAML Intellisense Extension")]
-    public class XAMLIntellisensePresenterProvider : IIntellisensePresenterProvider
+    public class DesktopStylesIntellisenseProvider : IIntellisensePresenterProvider
     {
         public IIntellisensePresenter TryCreateIntellisensePresenter(IIntellisenseSession session)
         {

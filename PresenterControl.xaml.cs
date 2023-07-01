@@ -19,16 +19,23 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Threading;
 using Microsoft.VisualStudio.Shell;
+using DesktopStylesIntellisenseShared;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace DesktopStylesIntellisense
 {
     /// <summary>
     /// Interaction logic for MyIntellisensePresenterUI.xaml
     /// </summary>
-    public partial class PresenterControl : ContentControl, IPopupIntellisensePresenter, IIntellisenseCommandTarget
+    public partial class PresenterControl : ContentControl, IPopupIntellisensePresenter, IIntellisenseCommandTarget, INotifyPropertyChanged
     {
         private ListView _textCompletionsListView;
         private ListView _brushCompletionsListView;
+        private IDesktopStylesWrapper _desktopStylesWrapper;
+        private IDictionary<string, Color> _brushesColors;
+        private IDictionary<string, Color> _colors;
+        private IDictionary<string, string> _icons;
 
         #region IPopupIntellisensePresenter_Properties_Implementation
         public event EventHandler SurfaceElementChanged;
@@ -95,9 +102,8 @@ It doesn't map to a span in the session's text view."
         // Completion Session
         public ICompletionSession CompletionSession { get; }
 
-        // collection view that facilitates filtering
-        // of the completions collection
-        public ICollectionView TheCompletionsCollectionView { get; }
+        private ICollectionView _theCompletionsCollectionView;
+        public ICollectionView TheCompletionsCollectionView { get => _theCompletionsCollectionView; set { _theCompletionsCollectionView = value; NotifyPropertyChanged(nameof(TheCompletionsCollectionView)); } }
 
         // The text being typed by the user. 
         // It is used for filtering the completion result set. 
@@ -113,17 +119,31 @@ It doesn't map to a span in the session's text view."
         {
             CompletionSession = completionSession;
             PresenterControlType = presenterControlType;
+            _desktopStylesWrapper = new DesktopStylesWrapper();
 
             CompletionSession.Dismissed += _completionSession_Dismissed;
 
+            // Get DesktopStyles resources
+            //GetBrushesFromStylesAsync();
+            //GetColorsFromStylesAsync();
+            //GetIconsFromStylesAsync();
+
             // get all completions 
             // this set does not change throughout the session
-            IEnumerable<Completion> allCompletions = completionSession.SelectedCompletionSet.Completions.ToList();
+            _brushesColors = _desktopStylesWrapper.GetColorsFromBrushes();
+
+            IEnumerable<Completion> allCompletions = CompletionSession.SelectedCompletionSet.Completions.ToList();
+            List<CollectionHelper> completeCompletions = new List<CollectionHelper>();
+            foreach (var item in allCompletions)
+            {
+                var value = _brushesColors.FirstOrDefault((x) => x.Key == item.DisplayText);
+                completeCompletions.Add(new CollectionHelper { Completion = item, Name = value.Key, Value = value.Value });
+            }
 
             // create the ICollectionView object
             // in order to facilitate the filtering of the
             // completions
-            TheCompletionsCollectionView = CollectionViewSource.GetDefaultView(allCompletions);
+            TheCompletionsCollectionView = CollectionViewSource.GetDefaultView(completeCompletions);
 
             // set the completion status to 
             // the current completion every time 
@@ -143,13 +163,25 @@ It doesn't map to a span in the session's text view."
 
             // select the Completion item corresponding
             // to the clicked ListViewItem
-            this.AddHandler(ResendEventBehavior.CustomEvent, (RoutedEventHandler) TheCompletionsListView_MouseDown);
+            this.AddHandler(ResendEventBehavior.CustomEvent, (RoutedEventHandler)TheCompletionsListView_MouseDown);
+        }
+
+        private void TheCompletionsGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private class CollectionHelper
+        {
+            public Completion Completion { get; set; }
+            public string Name { get; set; }
+            public Color Value { get; set;}
         }
 
         private void TextCompletionsListView_Loaded(object sender, RoutedEventArgs e)
         {
             // commit the session
-            if(_textCompletionsListView == null)
+            if (_textCompletionsListView == null)
             {
                 _textCompletionsListView = sender as ListView;
                 _textCompletionsListView.MouseDoubleClick += TheCompletionsListView_MouseDoubleClick;
@@ -180,7 +212,7 @@ It doesn't map to a span in the session's text view."
                     {
                         // sometimes it throws an unclear exception
                         // so placed it within try/catch block
-                        CompletionSession.SelectedCompletionSet.SelectionStatus = new CompletionSelectionStatus(selectedItem as Completion, true, true);
+                        CompletionSession.SelectedCompletionSet.SelectionStatus = new CompletionSelectionStatus((selectedItem as CollectionHelper).Completion, true, true);
                     }
                     catch
                     {
@@ -229,11 +261,11 @@ It doesn't map to a span in the session's text view."
             // we choose it. 
             if (!string.IsNullOrEmpty(userText))
             {
-                foreach (Completion completion in TheCompletionsCollectionView)
+                foreach (CollectionHelper item in TheCompletionsCollectionView)
                 {
-                    if (completion.DisplayText?.ToLower().StartsWith(userText) == true)
+                    if (item?.Completion.DisplayText?.ToLower().StartsWith(userText) == true)
                     {
-                        SelectItem(completion);
+                        SelectItem(item?.Completion);
                         foundCompletion = true;
                         break;
                     }
@@ -245,7 +277,7 @@ It doesn't map to a span in the session's text view."
             // items within the filtered collection
             if (!foundCompletion)
             {
-                TheCompletionsCollectionView.MoveCurrentToFirst();
+                TheCompletionsCollectionView?.MoveCurrentToFirst();
             }
 
             // we force the ListView to scroll to the 
@@ -253,7 +285,7 @@ It doesn't map to a span in the session's text view."
             ScrollAsync();
         }
 
-       async void ScrollAsync()
+        async void ScrollAsync()
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             ((Action)ScrollIntoView)?.Invoke();
@@ -261,8 +293,8 @@ It doesn't map to a span in the session's text view."
 
         async void ScrollIntoView()
         {
-            await Task.Delay(100);
-            object selectedItem = TheCompletionsCollectionView.CurrentItem;
+            await Task.Delay(50);
+            object selectedItem = TheCompletionsCollectionView?.CurrentItem;
 
             if (selectedItem != null)
             {
@@ -325,6 +357,13 @@ It doesn't map to a span in the session's text view."
             TheCompletionsCollectionView.MoveCurrentToPosition(newPosition);
 
             ScrollAsync();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

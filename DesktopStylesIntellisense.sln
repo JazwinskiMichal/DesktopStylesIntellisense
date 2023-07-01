@@ -5,6 +5,8 @@ VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesktopStylesIntellisense", "DesktopStylesIntellisense.csproj", "{20C39D0A-9D5A-45E6-BFD4-D9B37380D86C}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DesktopStylesIntellisenseShared", "..\DesktopStylesIntellisenseShared\DesktopStylesIntellisenseShared.shproj", "{503642D7-CBD0-4B20-A742-01B8A5EEA258}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,5 +23,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4CD2C8F5-F7D3-4B96-8DDD-B17964D8BE5A}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\DesktopStylesIntellisenseShared\DesktopStylesIntellisenseShared.projitems*{20c39d0a-9d5a-45e6-bfd4-d9b37380d86c}*SharedItemsImports = 4
+		..\DesktopStylesIntellisenseShared\DesktopStylesIntellisenseShared.projitems*{503642d7-cbd0-4b20-a742-01b8a5eea258}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal
